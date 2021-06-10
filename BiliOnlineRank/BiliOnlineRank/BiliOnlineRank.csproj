@@ -61,7 +61,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RSAUtil\RSAEncrypter.cs" />
-    <Compile Include="ServiceProvider.cs" />
+    <Compile Include="ApiProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

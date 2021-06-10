@@ -20,7 +20,7 @@
 1       50      <hide>
 -------- 在线用户 --------
 -        0      <hide>
-在线人数: 1
+在线人数: 2
 
 
 排名    贡献值  用户名
@@ -28,6 +28,36 @@
 1       50      <hide>
 -------- 在线用户 --------
 -        0      <hide>
-在线人数: 1
+在线人数: 2
 
+```
+
+## 本地服务
+
+支持通过本地 API 访问数据，默认地址为 `http://localhost:8000`
+
+### /data
+
+路径 `/data` 接收 `GET` 请求，无参数，返回 `json` 数据，示例如下：
+
+```
+{
+    "number": 2,
+    "gold_rank": [
+        {
+            "uid": <hide>,
+            "uname": "<hide>",
+            "face": "http://i2.hdslb.com/bfs/face/<hide>.jpg",
+            "rank": 1,
+            "score": 50
+        }
+    ],
+    "online_rank": [
+        {
+            "uid": <hide>,
+            "uname": "<hide>",
+            "face": "http://i2.hdslb.com/bfs/face/<hide>.jpg",
+        }
+    ]
+}
 ```
