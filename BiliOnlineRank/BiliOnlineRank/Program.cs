@@ -3,12 +3,46 @@ using Bili.Exceptions;
 using Bili.Models;
 using System;
 using System.IO;
+using System.Text;
 using System.Threading;
 
 namespace BiliOnlineRank
 {
     class Program
     {
+
+        private static string ReadPasswordFromConsole()
+        {
+            StringBuilder passwordBuilder = new StringBuilder();
+            {
+                while (true)
+                {
+                    ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+                    ConsoleKey key = keyInfo.Key;
+                    if (key == ConsoleKey.Enter)
+                    {
+                        break;
+                    }
+                    else if (key == ConsoleKey.Escape)
+                    {
+                        return null;
+                    }
+                    else if (key == ConsoleKey.Backspace)
+                    {
+                        if (passwordBuilder.Length > 0)
+                        {
+                            passwordBuilder.Remove(passwordBuilder.Length - 1, 1);
+                        }
+                    }
+                    else
+                    {
+                        passwordBuilder.Append(keyInfo.KeyChar);
+                    }
+                }
+            }
+            return passwordBuilder.ToString();
+        }
+
         static void Main(string[] args)
         {
             string defaultPrefix = "http://localhost:8000/";
@@ -27,10 +61,19 @@ namespace BiliOnlineRank
             }
             else
             {
+                Console.WriteLine("*注: 用户名为手机号");
+                Console.WriteLine("*注: 登录信息将会自动保存到 config.txt");
                 Console.Write("username: ");
                 username = Console.ReadLine().Trim();
                 Console.Write("password: ");
-                password = Console.ReadLine().Trim();
+                password = ReadPasswordFromConsole();
+                if(password == null)
+                {
+                    Console.Error.WriteLine("Login Interrupted");
+                    return;
+                }
+                Console.WriteLine($" <Hide>");
+
                 Console.Write($"service prefix ({defaultPrefix}): ");
                 prefix = Console.ReadLine().Trim();
 
