@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 
 namespace BiliOnlineRank
 {
+    /// <summary>
+    /// Class <c>ApiProvider</c> models a local Api service provider
+    /// </summary>
     public class ApiProvider
     {
         HttpListener httpListener;
@@ -17,12 +20,19 @@ namespace BiliOnlineRank
         public AnchorOnlineGoldRank GoldRank { get; set; }
         public OnlineRank Rank { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="prefix">prefix (E.g. "http://localhost:8000/")</param>
         public ApiProvider(string prefix)
         {
             httpListener = new HttpListener();
             httpListener.Prefixes.Add(prefix);
         }
 
+        /// <summary>
+        /// Start the service
+        /// </summary>
         public void Start()
         {
             httpListener.Start();
@@ -31,22 +41,34 @@ namespace BiliOnlineRank
             loopThread.Start();
         }
 
+        /// <summary>
+        /// Stop the service
+        /// </summary>
         public void Stop()
         {
             loopThread.Abort();
             httpListener.Stop();
         }
 
-        public void ServerLoop()
+        /// <summary>
+        /// Request handling loop
+        /// </summary>
+        private void ServerLoop()
         {
             while (httpListener.IsListening)
             {
                 HttpListenerContext ctx = httpListener.GetContext();
+
+                // Process requests in other threads
                 Task task = new Task(() => HandleContext(ctx));
                 task.Start();
             }
         }
 
+        /// <summary>
+        /// Http request handler
+        /// </summary>
+        /// <param name="ctx">http context</param>
         private void HandleContext(HttpListenerContext ctx)
         {
             HttpListenerRequest req = ctx.Request;
@@ -76,6 +98,11 @@ namespace BiliOnlineRank
             }
         }
 
+        /// <summary>
+        /// Request handler for "/"
+        /// </summary>
+        /// <param name="req"></param>
+        /// <param name="res"></param>
         private void IndexController(HttpListenerRequest req, HttpListenerResponse res)
         {
             byte[] buffer = Encoding.UTF8.GetBytes("Listening...");
@@ -87,6 +114,11 @@ namespace BiliOnlineRank
             res.Close();
         }
 
+        /// <summary>
+        /// Request handler for "/data"
+        /// </summary>
+        /// <param name="req"></param>
+        /// <param name="res"></param>
         private void DataController(HttpListenerRequest req, HttpListenerResponse res)
         {
             Json.Value.Array goldRank = new Json.Value.Array();
@@ -99,7 +131,7 @@ namespace BiliOnlineRank
                         { "uid", item.Uid },
                         { "uname", item.Name },
                         { "face", item.Face },
-                        { "rank", item.userRank },
+                        { "rank", item.UserRank },
                         { "score", item.Score },
                     };
                     goldRank.Add(goldRankItem);

@@ -8,13 +8,29 @@ using System.Text;
 
 namespace Bili.Models
 {
+    /// <summary>
+    /// Class <c>LoginInfo</c> models information of bilibili login
+    /// </summary>
     [Serializable]
     public class LoginInfo
     {
+        /// <summary>
+        /// Login token
+        /// </summary>
         public LoginToken Token { get; set; }
+        /// <summary>
+        /// Login cookies
+        /// </summary>
         public CookieCollection LoginCookies { get; set; }
+        /// <summary>
+        /// SSO info
+        /// </summary>
         public List<string> SSO { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="json">json object</param>
         public LoginInfo(Json.Value json)
         {
             Token = new LoginToken(json["token_info"]);

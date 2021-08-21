@@ -9,8 +9,17 @@ using System.Threading.Tasks;
 
 namespace Bili
 {
+    /// <summary>
+    /// Class <c>BiliApi</c> wraps common Api methods for bilibili live room.
+    /// </summary>
     class BiliLive
     {
+        /// <summary>
+        /// Get room info
+        /// </summary>
+        /// <param name="accessKey">access key</param>
+        /// <param name="uid">streamer uid</param>
+        /// <returns></returns>
         public static RoomInfo GetInfo(string accessKey, string uid)
         {
             Dictionary<string, string> payload = new Dictionary<string, string>()

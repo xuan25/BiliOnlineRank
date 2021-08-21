@@ -10,7 +10,10 @@ namespace BiliOnlineRank
 {
     class Program
     {
-
+        /// <summary>
+        /// Read user input from console as password
+        /// </summary>
+        /// <returns>password</returns>
         private static string ReadPasswordFromConsole()
         {
             StringBuilder passwordBuilder = new StringBuilder();
@@ -43,6 +46,10 @@ namespace BiliOnlineRank
             return passwordBuilder.ToString();
         }
 
+        /// <summary>
+        /// Entry point
+        /// </summary>
+        /// <param name="args"></param>
         static void Main(string[] args)
         {
             string defaultPrefix = "http://localhost:8000/";
@@ -51,6 +58,7 @@ namespace BiliOnlineRank
             string username, password, prefix;
             if (File.Exists("config.txt"))
             {
+                // Has login info
                 string[] lines = File.ReadAllLines("config.txt");
                 username = lines[0];
                 password = lines[1];
@@ -61,6 +69,7 @@ namespace BiliOnlineRank
             }
             else
             {
+                // Require login info
                 Console.WriteLine("*注: 用户名为手机号");
                 Console.WriteLine("*注: 登录信息将会自动保存到 config.txt");
                 Console.Write("username: ");
@@ -133,7 +142,7 @@ namespace BiliOnlineRank
                 apiProvider.GoldRank = onlineGoldRank;
                 foreach (AnchorOnlineGoldRankItem item in onlineGoldRank.Items)
                 {
-                    Console.WriteLine($"{item.userRank}\t{item.Score}\t{item.Name}");
+                    Console.WriteLine($"{item.UserRank}\t{item.Score}\t{item.Name}");
                 }
 
                 Console.WriteLine("-------- 在线用户 --------");
