@@ -60,7 +60,7 @@ namespace BiliOnlineRank
             {
                 Window window = new Window()
                 {
-                    Title = "Captcha",
+                    Title = "验证码",
                     Width = image.Width * 2,
                     Height = image.Height * 2 + 36,
                     Content = new Image() { Source = image }
@@ -81,7 +81,7 @@ namespace BiliOnlineRank
         {
             string defaultPrefix = "http://localhost:8000/";
             // Init
-            Console.WriteLine("-------- Info --------");
+            Console.WriteLine("-------- 信息 --------");
             string username, password, prefix;
             if (File.Exists("config.txt"))
             {
@@ -90,27 +90,27 @@ namespace BiliOnlineRank
                 username = lines[0];
                 password = lines[1];
                 prefix = lines[2];
-                Console.WriteLine($"username: <Hide>");
-                Console.WriteLine($"password: <Hide>");
-                Console.WriteLine($"prefix: {prefix}");
+                Console.WriteLine($"用户名: <隐藏>");
+                Console.WriteLine($"密码: <隐藏>");
+                Console.WriteLine($"本地服务前缀: {prefix}");
             }
             else
             {
                 // Require login info
                 Console.WriteLine("*注: 用户名为手机号");
                 Console.WriteLine("*注: 登录信息将会自动保存到 config.txt");
-                Console.Write("username: ");
+                Console.Write("用户名: ");
                 username = Console.ReadLine().Trim();
-                Console.Write("password: ");
+                Console.Write("密码: ");
                 password = ReadPasswordFromConsole();
                 if(password == null)
                 {
-                    Console.Error.WriteLine("Login Interrupted");
+                    Console.Error.WriteLine("登录中断");
                     return;
                 }
-                Console.WriteLine($" <Hide>");
+                Console.WriteLine($" <隐藏>");
 
-                Console.Write($"service prefix ({defaultPrefix}): ");
+                Console.Write($"本地服务前缀 (默认为 {defaultPrefix}): ");
                 prefix = Console.ReadLine().Trim();
 
                 File.WriteAllLines("config.txt", new string[] { username, password, prefix });
@@ -126,7 +126,7 @@ namespace BiliOnlineRank
             try
             {
                 // Normal login
-                Console.WriteLine("-------- Normal login --------");
+                Console.WriteLine("-------- 普通登录 --------");
                 loginInfo = BiliLogin.Login(username, password);
                 Console.WriteLine(loginInfo);
                 Console.WriteLine();
@@ -145,22 +145,16 @@ namespace BiliOnlineRank
                 try
                 {
                     // Login with captcha
-                    Console.WriteLine("-------- Login with captcha --------");
+                    Console.WriteLine("-------- 验证码登录 --------");
                     BitmapImage captchaImage = BiliLogin.GetCaptcha();
 
                     Thread captchThread = ShowImage(captchaImage);
-                    Console.Write("Please type in the captcha: ");
+                    Console.Write("请输入验证码: ");
                     string captcha = Console.ReadLine();
                     captchThread.Abort();
 
                     loginInfo = BiliLogin.Login(username, password, captcha);
                     Console.WriteLine(loginInfo);
-                    Console.WriteLine();
-
-                    // Refresh token
-                    Console.WriteLine("-------- Refresh token --------");
-                    LoginToken newLoginToken = BiliLogin.RefreshToken(loginInfo.Token);
-                    Console.WriteLine(newLoginToken);
                     Console.WriteLine();
                 }
                 catch (LoginFailedException ex)
@@ -175,12 +169,19 @@ namespace BiliOnlineRank
 
             if(loginInfo == null)
             {
-                Console.Error.WriteLine("Login Failed");
+                Console.Error.WriteLine("登录失败");
                 return;
             }
 
+            // Refresh token
+            // TODO: store and re-use the token 
+            Console.WriteLine("-------- 更新令牌 --------");
+            LoginToken newLoginToken = BiliLogin.RefreshToken(loginInfo.Token);
+            Console.WriteLine(newLoginToken);
+            Console.WriteLine();
+
             // Room Info
-            Console.WriteLine("-------- Room Info --------");
+            Console.WriteLine("-------- 房间信息 --------");
             RoomInfo roomInfo = BiliLive.GetInfo(loginInfo.Token.AccessToken, loginInfo.Token.Mid.ToString());
             Console.WriteLine($"房间号: {roomInfo.RoomId}");
             Console.WriteLine($"用户ID: {roomInfo.Uid}");
@@ -191,14 +192,14 @@ namespace BiliOnlineRank
             Console.WriteLine();
 
             // Service
-            Console.WriteLine("-------- Service --------");
+            Console.WriteLine("-------- 本地服务 --------");
             ApiProvider apiProvider = new ApiProvider(prefix);
             apiProvider.Start();
             Console.WriteLine($"服务运行在: {prefix}");
             Console.WriteLine($"  /data: 获取数据");
 
             // Ranking list
-            Console.WriteLine("-------- Ranking list --------");
+            Console.WriteLine("-------- 排行榜 --------");
             Console.WriteLine();
             while (true)
             {
