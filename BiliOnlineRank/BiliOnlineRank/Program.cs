@@ -5,6 +5,9 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 
 namespace BiliOnlineRank
 {
@@ -44,6 +47,30 @@ namespace BiliOnlineRank
                 }
             }
             return passwordBuilder.ToString();
+        }
+
+        /// <summary>
+        /// Show a image in a new window
+        /// </summary>
+        /// <param name="image">image</param>
+        /// <returns>Window thread</returns>
+        public static Thread ShowImage(BitmapImage image)
+        {
+            Thread windowThread = new Thread(() =>
+            {
+                Window window = new Window()
+                {
+                    Title = "Captcha",
+                    Width = image.Width * 2,
+                    Height = image.Height * 2 + 36,
+                    Content = new Image() { Source = image }
+                };
+                window.ShowDialog();
+            });
+            windowThread.SetApartmentState(ApartmentState.STA);
+            windowThread.Start();
+
+            return windowThread;
         }
 
         /// <summary>
@@ -111,6 +138,45 @@ namespace BiliOnlineRank
             catch (LoginStatusException ex)
             {
                 Console.WriteLine(ex);
+            }
+
+            if(loginInfo == null)
+            {
+                try
+                {
+                    // Login with captcha
+                    Console.WriteLine("-------- Login with captcha --------");
+                    BitmapImage captchaImage = BiliLogin.GetCaptcha();
+
+                    Thread captchThread = ShowImage(captchaImage);
+                    Console.Write("Please type in the captcha: ");
+                    string captcha = Console.ReadLine();
+                    captchThread.Abort();
+
+                    loginInfo = BiliLogin.Login(username, password, captcha);
+                    Console.WriteLine(loginInfo);
+                    Console.WriteLine();
+
+                    // Refresh token
+                    Console.WriteLine("-------- Refresh token --------");
+                    LoginToken newLoginToken = BiliLogin.RefreshToken(loginInfo.Token);
+                    Console.WriteLine(newLoginToken);
+                    Console.WriteLine();
+                }
+                catch (LoginFailedException ex)
+                {
+                    Console.WriteLine(ex);
+                }
+                catch (LoginStatusException ex)
+                {
+                    Console.WriteLine(ex);
+                }
+            }
+
+            if(loginInfo == null)
+            {
+                Console.Error.WriteLine("Login Failed");
+                return;
             }
 
             // Room Info
