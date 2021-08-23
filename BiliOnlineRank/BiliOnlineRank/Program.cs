@@ -106,6 +106,8 @@ namespace BiliOnlineRank
                 if(password == null)
                 {
                     Console.Error.WriteLine("登录中断");
+                    Console.Write("按任意键退出...");
+                    Console.ReadKey();
                     return;
                 }
                 Console.WriteLine($" <隐藏>");
@@ -170,6 +172,8 @@ namespace BiliOnlineRank
             if(loginInfo == null)
             {
                 Console.Error.WriteLine("登录失败");
+                Console.Write("按任意键退出...");
+                Console.ReadKey();
                 return;
             }
 
