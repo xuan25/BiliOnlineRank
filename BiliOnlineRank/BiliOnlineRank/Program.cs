@@ -200,7 +200,7 @@ namespace BiliOnlineRank
             ApiProvider apiProvider = new ApiProvider(prefix);
             apiProvider.Start();
             Console.WriteLine($"服务运行在: {prefix}");
-            Console.WriteLine($"  /data: 获取数据");
+            Console.WriteLine($"  /data: 获取数据 ({prefix}data)");
 
             // Ranking list
             Console.WriteLine("-------- 排行榜 --------");
