@@ -48,13 +48,8 @@
   <ItemGroup>
     <Compile Include="Bili\BiliApi.cs" />
     <Compile Include="Bili\BiliLive.cs" />
-    <Compile Include="Bili\BiliLogin.cs" />
-    <Compile Include="Bili\Exceptions\LoginFailedException.cs" />
-    <Compile Include="Bili\Exceptions\LoginInterruptedException.cs" />
     <Compile Include="Bili\Models\AnchorOnlineGoldRank.cs" />
     <Compile Include="Bili\Models\AnchorOnlineGoldRankItem.cs" />
-    <Compile Include="Bili\Models\LoginInfo.cs" />
-    <Compile Include="Bili\Models\LoginToken.cs" />
     <Compile Include="Bili\Models\OnlineRank.cs" />
     <Compile Include="Bili\Models\OnlineRankItem.cs" />
     <Compile Include="Bili\Models\RoomInfo.cs" />

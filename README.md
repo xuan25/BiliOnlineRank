@@ -1,6 +1,6 @@
 # BiliOnlineRank
 
-用于获取直播在线人数和高能榜。账号登录组件见 [xuan525/BiliPassport](https://github.com/xuan525/BiliPassport)
+用于获取直播在线人数和高能榜。~~账号登录组件见 [xuan525/BiliPassport](https://github.com/xuan525/BiliPassport)~~ 由于b站频繁更新登录接口，本项目将不再包含登录组件，请自行获取账户的 访问令牌 (Access token)。
 
 包含使用样例`Program.cs`，输出如下（已做匿名化处理）：
 
