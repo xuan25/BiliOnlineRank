@@ -11,10 +11,12 @@ namespace Bili.Exceptions
         /// Login status from remote
         /// </summary>
         public int Status { get; private set; }
+        public string AuthUrl { get; private set; }
 
-        public LoginStatusException(int status, string message) : base(message)
+        public LoginStatusException(int status, string authUrl, string message) : base(message)
         {
             Status = status;
+            AuthUrl = authUrl;
         }
     }
 }

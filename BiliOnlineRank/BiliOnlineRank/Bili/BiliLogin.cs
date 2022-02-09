@@ -4,9 +4,11 @@ using JsonUtil;
 using RSAUtil;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
@@ -20,6 +22,11 @@ namespace Bili
     /// </summary>
     public static class BiliLogin
     {
+        public static string buvid = $"XZ{Guid.NewGuid().ToString("N")}{Guid.NewGuid().ToString("N").Substring(0, 4)}";
+        public static string deviceId = $"{Guid.NewGuid().ToString("N")}{DateTime.Now.ToString("yyyyMMddHHmmssffff")}{Guid.NewGuid().ToString("N").Substring(0, 16)}";
+        public static string deviceGuid = Guid.NewGuid().ToString("D");
+        public static string version = "5.57.2";
+
         /// <summary>
         /// Login with username and password
         /// </summary>
@@ -33,28 +40,98 @@ namespace Bili
 
             Dictionary<string, string> payload = new Dictionary<string, string>()
             {
+                { "bili_local_id", deviceId },
+                { "buvid", buvid },
+                { "channel", "bili" },
+                { "device", "phone" },
+                { "device_id", deviceId },  
+                { "device_name", $"BiliAccount{deviceGuid}" },
+                { "device_platform", $"BiliAccount{Assembly.GetExecutingAssembly().GetName().Version}" },
+                { "from_pv", "main.my-information.my-login.0.click" },
+                { "from_url", "bilibili://user_center/mine" },
+                { "local_id", buvid },
+                { "mobi_app", "android" },
+                { "platform", "android" },
+                { "statistics", $"{{\"appId\":1,\"platform\":3,\"version\":\"{version}\",\"abtest\":\"\"}}" },
+                { "ts", ((DateTime.Now.ToUniversalTime().Ticks - 621355968000000000) / 10000000).ToString() },
                 { "username", username },
                 { "password", encryptedPassword },
             };
+
             if (captcha != null)
             {
                 payload.Add("captcha", captcha);
             }
 
-            string authUrl = "https://passport.bilibili.com/api/v3/oauth2/login";
+            string authUrl = "https://passport.bilibili.com/x/passport-login/oauth2/login";
             Json.Value res = BiliApi.RequestJsonResult(authUrl, payload, true, "POST");
 
             switch ((int)res["code"])
             {
-                case 0:
+                case 0: // first step success 
                     switch ((int)res["data"]["status"])
                     {
-                        case 0:
+                        case 0: // login success
                             LoginInfo loginInfo = new LoginInfo(res["data"]);
                             return loginInfo;
+                        case 1: // tel verification
+                        case 2: // device verification
+                        case 3:
                         default:
-                            throw new LoginStatusException(res["data"]["status"], res);
+                            throw new LoginStatusException(res["data"]["status"], res["data"]["url"], res["data"]["message"]);
                     }
+                case -105: // captcha required
+                case -629: // incorrect password
+                default:
+                    throw new LoginFailedException(res["code"], res["message"]);
+            }
+        }
+
+        /// <summary>
+        /// Login with authorization code
+        /// </summary>
+        /// <param name="authCode">authorization code</param>
+        /// <returns>LoginInfo</returns>
+        public static LoginInfo Login(string authCode)
+        {
+            Dictionary<string, string> payload = new Dictionary<string, string>()
+            {
+                { "bili_local_id", deviceId },
+                { "channel", "bili" },
+                { "code", authCode },
+                { "grant_type", "authorization_code" },
+                { "local_id", buvid },
+                { "mobi_app", "android" },
+                { "platform", "android" },
+                { "statistics", $"{{\"appId\":1,\"platform\":3,\"version\":\"{version}\",\"abtest\":\"\"}}" },
+                { "ts", ((DateTime.Now.ToUniversalTime().Ticks - 621355968000000000) / 10000000).ToString() }
+            };
+
+            string authUrl = "https://passport.bilibili.com/api/v2/oauth2/access_token";
+
+            NameValueCollection headers = new NameValueCollection()
+            {
+                { "Buvid", buvid }
+            };
+
+            Json.Value res = BiliApi.RequestJsonResult(authUrl, payload, true, "GET", headers);
+
+            switch ((int)res["code"])
+            {
+                case 0: // first step success 
+                    switch ((int)res["data"]["status"])
+                    {
+                        case 0: // login success
+                            LoginInfo loginInfo = new LoginInfo(res["data"]);
+                            return loginInfo;
+                        case 1: // tel verification
+                        case 2: // device verification
+                        case 3:
+                        default:
+                            throw new LoginStatusException(res["data"]["status"], res["data"]["url"], res["data"]["message"]);
+                    }
+                case -105: // captcha required
+                case -629: // incorrect password
                 default:
                     throw new LoginFailedException(res["code"], res["message"]);
             }

@@ -1,5 +1,6 @@
 ﻿using JsonUtil;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -17,8 +18,8 @@ namespace Bili
     class BiliApi
     {
         // Api infos
-        public const string APP_KEY = "4409e2ce8ffd12b8";
-        public const string APP_SECRET = "59b43e04ad6965f34319062b478f83dd";
+        public const string APP_KEY = "bca7e84c2d947ac6";
+        public const string APP_SECRET = "60698ba2f68e01ce44738920a0ffe768";
         public const string BUILD = "5520400";
 
         // Cookies for identification
@@ -104,11 +105,12 @@ namespace Bili
         /// <param name="query">Parameter dictionary</param>
         /// <param name="sign">Add verification sign for parameters</param>
         /// <returns>Text result</returns>
-        public static string RequestTextResult(string url, Dictionary<string, string> query, bool sign, string method = "GET")
+        public static string RequestTextResult(string url, Dictionary<string, string> query, bool sign, string method = "GET", NameValueCollection headers = null)
         {
             string queryStr = BuildQuery(query, sign);
 
             HttpWebRequest request;
+            
             switch (method)
             {
                 case "GET":
@@ -125,6 +127,11 @@ namespace Bili
 
             request.Referer = System.Text.RegularExpressions.Regex.Match(url, "https?://[^/]+").Value;
             request.CookieContainer = Cookies;
+
+            if (headers != null)
+            {
+                request.Headers.Add(headers);
+            }
 
             if (method == "POST")
             {
@@ -149,11 +156,11 @@ namespace Bili
         /// <param name="query">Parameter dictionary</param>
         /// <param name="sign">Add verification sign for parameters</param>
         /// <returns>Text result</returns>
-        public static Task<string> RequestTextResultAsync(string url, Dictionary<string, string> query, bool sign, string method = "GET")
+        public static Task<string> RequestTextResultAsync(string url, Dictionary<string, string> query, bool sign, string method = "GET", NameValueCollection headers = null)
         {
             Task<string> task = new Task<string>(() =>
             {
-                return RequestTextResult(url, query, sign, method);
+                return RequestTextResult(url, query, sign, method, headers);
             });
             task.Start();
             return task;
@@ -166,9 +173,9 @@ namespace Bili
         /// <param name="query">Parameter dictionary</param>
         /// <param name="sign">Add verification sign for parameters</param>
         /// <returns>IJson result</returns>
-        public static Json.Value RequestJsonResult(string url, Dictionary<string, string> query, bool sign, string method = "GET")
+        public static Json.Value RequestJsonResult(string url, Dictionary<string, string> query, bool sign, string method = "GET", NameValueCollection headers = null)
         {
-            string result = RequestTextResult(url, query, sign, method);
+            string result = RequestTextResult(url, query, sign, method, headers);
             Json.Value json = Json.Parser.Parse(result);
             return json;
         }
@@ -180,11 +187,11 @@ namespace Bili
         /// <param name="query">Parameter dictionary</param>
         /// <param name="sign">Add verification sign for parameters</param>
         /// <returns>IJson result</returns>
-        public static Task<Json.Value> RequestJsonResultAsync(string url, Dictionary<string, string> query, bool sign, string method = "GET")
+        public static Task<Json.Value> RequestJsonResultAsync(string url, Dictionary<string, string> query, bool sign, string method = "GET", NameValueCollection headers = null)
         {
             Task<Json.Value> task = new Task<Json.Value>(() =>
             {
-                return RequestJsonResult(url, query, sign, method);
+                return RequestJsonResult(url, query, sign, method, headers);
             });
             task.Start();
             return task;

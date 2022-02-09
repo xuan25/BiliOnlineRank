@@ -77,6 +77,7 @@ namespace BiliOnlineRank
         /// Entry point
         /// </summary>
         /// <param name="args"></param>
+        [STAThread]
         static void Main(string[] args)
         {
             string defaultPrefix = "http://localhost:8000/";
@@ -125,6 +126,9 @@ namespace BiliOnlineRank
 
             // Login
             LoginInfo loginInfo = null;
+            int lastFailedcode = 0;
+            int lastStatuscode = 0;
+            string authUrl = null;
             try
             {
                 // Normal login
@@ -136,37 +140,75 @@ namespace BiliOnlineRank
             catch (LoginFailedException ex)
             {
                 Console.WriteLine(ex);
+                lastFailedcode = ex.Code;
             }
             catch (LoginStatusException ex)
             {
                 Console.WriteLine(ex);
+                lastStatuscode = ex.Status;
+                authUrl = ex.AuthUrl;
             }
 
-            if(loginInfo == null)
+            switch(lastFailedcode)
             {
-                try
-                {
-                    // Login with captcha
-                    Console.WriteLine("-------- 验证码登录 --------");
-                    BitmapImage captchaImage = BiliLogin.GetCaptcha();
+                case 0:
+                    switch (lastStatuscode)
+                    {
+                        case 0:
+                            Console.WriteLine("登录成功");
+                            break;
+                        case 1: // tel verification
+                        case 2: // device verification
+                        case 3:
+                            Console.WriteLine("-------- 设备授权登录 --------");
+                            DeviceAuthWindow deviceAuthWindow = null;
+                            ManualResetEvent windowInitedEvent = new ManualResetEvent(false);
+                            Thread windowThread = new Thread(() =>
+                            {
+                                deviceAuthWindow = new DeviceAuthWindow(new Uri(authUrl));
+                                windowInitedEvent.Set();
+                                deviceAuthWindow.ShowDialog();
+                            });
+                            windowThread.SetApartmentState(ApartmentState.STA);
+                            windowThread.Start();
 
-                    Thread captchThread = ShowImage(captchaImage);
-                    Console.Write("请输入验证码: ");
-                    string captcha = Console.ReadLine();
-                    captchThread.Abort();
+                            windowInitedEvent.WaitOne();
+                            string authCode = deviceAuthWindow.GetCode();
 
-                    loginInfo = BiliLogin.Login(username, password, captcha);
-                    Console.WriteLine(loginInfo);
-                    Console.WriteLine();
-                }
-                catch (LoginFailedException ex)
-                {
-                    Console.WriteLine(ex);
-                }
-                catch (LoginStatusException ex)
-                {
-                    Console.WriteLine(ex);
-                }
+                            loginInfo = BiliLogin.Login(authCode);
+                            Console.WriteLine(loginInfo);
+                            Console.WriteLine();
+                            break;
+                    }
+                    break;
+                case -105:
+                    try
+                    {
+                        // Login with captcha
+                        Console.WriteLine("-------- 验证码登录 --------");
+                        BitmapImage captchaImage = BiliLogin.GetCaptcha();
+
+                        Thread captchThread = ShowImage(captchaImage);
+                        Console.Write("请输入验证码: ");
+                        string captcha = Console.ReadLine();
+                        captchThread.Abort();
+
+                        loginInfo = BiliLogin.Login(username, password, captcha);
+                        Console.WriteLine(loginInfo);
+                        Console.WriteLine();
+                    }
+                    catch (LoginFailedException ex)
+                    {
+                        Console.WriteLine(ex);
+                    }
+                    catch (LoginStatusException ex)
+                    {
+                        Console.WriteLine(ex);
+                    }
+                    break;
+                case -629:
+                    Console.WriteLine("密码错误");
+                    break;
             }
 
             if(loginInfo == null)
