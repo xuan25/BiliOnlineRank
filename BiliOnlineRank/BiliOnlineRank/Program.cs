@@ -20,11 +20,38 @@ namespace BiliOnlineRank
         {
             string defaultPrefix = "http://localhost:8000/";
 
-            // User info
-            Console.Write("访问令牌 (Access Token): ");
-            string accessToken = Console.ReadLine().Trim();
-            Console.Write($"本地服务前缀 (默认为 {defaultPrefix}): ");
-            string prefix = Console.ReadLine().Trim();
+            // User config
+            string accessToken;
+            string prefix;
+            if (File.Exists("config.txt"))
+            {
+                // Has login info
+                string[] lines = File.ReadAllLines("config.txt");
+                accessToken = lines.Length > 0 ? lines[0] : string.Empty;
+                prefix = lines.Length > 1 ? lines[1] : string.Empty;
+                Console.WriteLine($"访问令牌 (Access Token): <隐藏>");
+                Console.WriteLine($"本地服务前缀: {prefix}");
+            }
+            else
+            {
+                // Require login info
+                Console.WriteLine("*注: 配置信息将会自动保存到 config.txt");
+                Console.Write("访问令牌 (Access Token): ");
+                accessToken = Console.ReadLine().Trim();
+                Console.Write($"本地服务前缀 (默认为 {defaultPrefix}): ");
+                prefix = Console.ReadLine().Trim();
+
+                File.WriteAllLines("config.txt", new string[] { accessToken, prefix });
+            }
+
+            // validate inputs
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                Console.Error.WriteLine("访问令牌 (Access Token) 不得为空，登录中断。");
+                Console.Write("按任意键退出...");
+                Console.ReadKey();
+                return;
+            }
             if (string.IsNullOrEmpty(prefix))
             {
                 prefix = defaultPrefix;
