@@ -1,5 +1,4 @@
 ﻿using Bili;
-using Bili.Exceptions;
 using Bili.Models;
 using System;
 using System.IO;
@@ -21,9 +20,7 @@ namespace BiliOnlineRank
         {
             string defaultPrefix = "http://localhost:8000/";
 
-            // Require login info
-            Console.Write("用户ID (UID): ");
-            string mid = Console.ReadLine().Trim();
+            // User info
             Console.Write("访问令牌 (Access Token): ");
             string accessToken = Console.ReadLine().Trim();
             Console.Write($"本地服务前缀 (默认为 {defaultPrefix}): ");
@@ -35,7 +32,8 @@ namespace BiliOnlineRank
 
             // Room Info
             Console.WriteLine("-------- 房间信息 --------");
-            RoomInfo roomInfo = BiliLive.GetInfo(accessToken, mid);
+            string mid = BiliLive.GetMid(accessToken).ToString();
+            RoomInfo roomInfo = BiliLive.GetRoomInfo(accessToken, mid);
             Console.WriteLine($"房间号: {roomInfo.RoomId}");
             Console.WriteLine($"用户ID: {roomInfo.Uid}");
             Console.WriteLine($"用户名: {roomInfo.Uname}");
