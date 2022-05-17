@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
@@ -20,32 +21,32 @@ namespace BiliLogin
         /// <param name="sender">Sender</param>
         /// <param name="cookies">Identity cookie</param>
         /// <param name="uid">Loged in uid</param>
-        public delegate void LoggedInDel(MoblieLoginWindow sender, CookieCollection cookies, uint uid);
+        public delegate void LoggedInHandler(MoblieLoginWindow sender, CookieCollection cookies, uint uid);
         /// <summary>
         /// Occurs when user logged in.
         /// </summary>
-        public event LoggedInDel LoggedIn;
+        public event LoggedInHandler LoggedIn;
 
         /// <summary>
         /// ConnectionFailed delegate.
         /// </summary>
         /// <param name="sender">Sender</param>
         /// <param name="ex">Exception</param>
-        public delegate void ConnectionFailedDel(MoblieLoginWindow sender, WebException ex);
+        public delegate void ConnectionFailedHandler(MoblieLoginWindow sender, WebException ex);
         /// <summary>
         /// Occurs when connection failed.
         /// </summary>
-        public event ConnectionFailedDel ConnectionFailed;
+        public event ConnectionFailedHandler ConnectionFailed;
 
         /// <summary>
         /// Canceled delegate.
         /// </summary>
         /// <param name="sender">Sender</param>
-        public delegate void CanceledDel(MoblieLoginWindow sender);
+        public delegate void CanceledHandler(MoblieLoginWindow sender);
         /// <summary>
         /// Occurs when login has been canceled.
         /// </summary>
-        public event CanceledDel Canceled;
+        public event CanceledHandler Canceled;
 
         public MoblieLoginWindow(Window parent)
         {
@@ -94,7 +95,9 @@ namespace BiliLogin
             biliLoginQR.Begin();
         }
 
-        [System.Runtime.InteropServices.DllImport("gdi32")] static extern int DeleteObject(IntPtr o);
+        [DllImport("gdi32")] 
+        static extern int DeleteObject(IntPtr o);
+
         private void BiliLoginQR_QRImageLoaded(BiliLoginQR sender, Bitmap qrImage)
         {
             Dispatcher.Invoke(new Action(() =>

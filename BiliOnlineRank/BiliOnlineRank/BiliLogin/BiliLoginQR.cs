@@ -22,22 +22,22 @@ namespace BiliLogin
         /// </summary>
         /// <param name="sender">Seader</param>
         /// <param name="url">login url</param>
-        public delegate void LoginUrlRecievedDel(BiliLoginQR sender, string url);
+        public delegate void LoginUrlRecievedHandler(BiliLoginQR sender, string url);
         /// <summary>
         /// Occurs when a login url has been recieved.
         /// </summary>
-        public event LoginUrlRecievedDel LoginUrlRecieved;
+        public event LoginUrlRecievedHandler LoginUrlRecieved;
 
         /// <summary>
         /// QRImageLoaded delegate.
         /// </summary>
         /// <param name="sender">Sender</param>
         /// <param name="qrImage">QR code bitmap</param>
-        public delegate void QRImageLoadedDel(BiliLoginQR sender, Bitmap qrImage);
+        public delegate void QRImageLoadedHandler(BiliLoginQR sender, Bitmap qrImage);
         /// <summary>
         /// Occurs when a login QR code has been generated.
         /// </summary>
-        public event QRImageLoadedDel QRImageLoaded;
+        public event QRImageLoadedHandler QRImageLoaded;
 
         /// <summary>
         /// LoggedIn delegate.
@@ -45,42 +45,42 @@ namespace BiliLogin
         /// <param name="sender">Sender</param>
         /// <param name="cookies">Identity cookie</param>
         /// <param name="uid">Loged in uid</param>
-        public delegate void LoggedInDel(BiliLoginQR sender, CookieCollection cookies, uint uid);
+        public delegate void LoggedInHandler(BiliLoginQR sender, CookieCollection cookies, uint uid);
         /// <summary>
         /// Occurs when user logged in.
         /// </summary>
-        public event LoggedInDel LoggedIn;
+        public event LoggedInHandler LoggedIn;
 
         /// <summary>
         /// Updated delegate.
         /// </summary>
         /// <param name="sender">Sender</param>
-        public delegate void UpdatedDel(BiliLoginQR sender);
+        public delegate void UpdatedHandler(BiliLoginQR sender);
         /// <summary>
         /// Occurs when a status info has been recieved.
         /// </summary>
-        public event UpdatedDel Updated;
+        public event UpdatedHandler Updated;
 
         /// <summary>
         /// ConnectionFailed delegate.
         /// </summary>
         /// <param name="sender">Seander</param>
         /// <param name="ex">Exception</param>
-        public delegate void ConnectionFailedDel(BiliLoginQR sender, WebException ex);
+        public delegate void ConnectionFailedHandler(BiliLoginQR sender, WebException ex);
         /// <summary>
         /// Occurs when connection failed.
         /// </summary>
-        public event ConnectionFailedDel ConnectionFailed;
+        public event ConnectionFailedHandler ConnectionFailed;
 
         /// <summary>
         /// Timeout delegate.
         /// </summary>
         /// <param name="sender">Sender</param>
-        public delegate void TimeoutDel(BiliLoginQR sender);
+        public delegate void TimeoutHandler(BiliLoginQR sender);
         /// <summary>
         /// Occurs when the QR code is timeout.
         /// </summary>
-        public event TimeoutDel Timeout;
+        public event TimeoutHandler Timeout;
 
         private Thread loginListenerThread;
         private string oauthKey;
