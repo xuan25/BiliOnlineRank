@@ -14,47 +14,20 @@ namespace Bili
     /// </summary>
     class BiliLive
     {
-        /// <summary>
-        /// Get memberID from Access Token
-        /// </summary>
-        /// <param name="accessToken">access token</param>
-        /// <returns>mid</returns>
-        public static int GetMid(string accessToken)
-        {
-            Dictionary<string, string> payload = new Dictionary<string, string>()
-            {
-                { "access_token", accessToken }
-            };
-
-            string authUrl = "https://passport.bilibili.com/api/oauth2/info";
-            Json.Value res = BiliApi.RequestJsonResult(authUrl, payload, true);
-
-            switch ((int)res["code"])
-            {
-                case 0:
-                    return res["data"]["mid"];
-                default:
-                    throw new Exception("Invalid Access Token");
-            }
-        }
 
         /// <summary>
         /// Get room info
         /// </summary>
-        /// <param name="accessToken">access token</param>
-        /// <param name="uid">streamer uid</param>
         /// <returns></returns>
-        public static RoomInfo GetRoomInfo(string accessToken, string uid)
+        public static RoomInfo GetRoomInfo()
         {
             Dictionary<string, string> payload = new Dictionary<string, string>()
             {
-                { "access_key", accessToken },
                 { "platform", "pc_link" },
-                { "uId", uid },
             };
 
             string authUrl = "https://api.live.bilibili.com/xlive/app-blink/v1/room/GetInfo";
-            Json.Value res = BiliApi.RequestJsonResult(authUrl, payload, true);
+            Json.Value res = BiliApi.RequestJsonResult(authUrl, payload, false);
 
             switch((int)res["code"])
             {
@@ -69,17 +42,15 @@ namespace Bili
         /// <summary>
         /// Get online rank (online users)
         /// </summary>
-        /// <param name="accessKey">access key</param>
         /// <param name="page">page number</param>
         /// <param name="pageSize">page size</param>
         /// <param name="roomId">room id</param>
         /// <param name="ruid">user id</param>
         /// <returns>OnlineRank</returns>
-        public static OnlineRank GetOnlineRank(string accessKey, string page, string pageSize, string roomId, string ruid)
+        public static OnlineRank GetOnlineRank(string page, string pageSize, string roomId, string ruid)
         {
             Dictionary<string, string> payload = new Dictionary<string, string>()
             {
-                { "access_key", accessKey },
                 { "page", page },
                 { "pageSize", pageSize },
                 { "roomId", roomId },
@@ -88,7 +59,7 @@ namespace Bili
             };
 
             string authUrl = "https://api.live.bilibili.com/xlive/general-interface/v1/rank/getOnlineRank";
-            Json.Value res = BiliApi.RequestJsonResult(authUrl, payload, true);
+            Json.Value res = BiliApi.RequestJsonResult(authUrl, payload, false);
 
             switch ((int)res["code"])
             {
@@ -103,17 +74,15 @@ namespace Bili
         /// <summary>
         /// Get anchor online gold rank (gold rank)
         /// </summary>
-        /// <param name="accessKey">access key</param>
         /// <param name="page">page number</param>
         /// <param name="pageSize">page size</param>
         /// <param name="roomId">room id</param>
         /// <param name="ruid">user id</param>
         /// <returns>AnchorOnlineGoldRank</returns>
-        public static AnchorOnlineGoldRank GetAnchorOnlineGoldRank(string accessKey, string page, string pageSize, string roomId, string ruid)
+        public static AnchorOnlineGoldRank GetAnchorOnlineGoldRank(string page, string pageSize, string roomId, string ruid)
         {
             Dictionary<string, string> payload = new Dictionary<string, string>()
             {
-                { "access_key", accessKey },
                 { "page", page },
                 { "pageSize", pageSize },
                 { "roomId", roomId },
@@ -122,7 +91,7 @@ namespace Bili
             };
 
             string authUrl = "https://api.live.bilibili.com/xlive/general-interface/v1/rank/getAnchorOnlineGoldRank";
-            Json.Value res = BiliApi.RequestJsonResult(authUrl, payload, true);
+            Json.Value res = BiliApi.RequestJsonResult(authUrl, payload, false);
 
             switch ((int)res["code"])
             {
